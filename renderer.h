@@ -36,8 +36,6 @@ class Renderer {
         
         static int ToPixels(float n, int s);
         static float Normalize(int n, int s);
-        // int ToPixels(float x, float y); // need to be vector, to lazy to implement and will have the same drawbacks
-        // float Normalize(int x, int y); 
 };
 
 #endif
