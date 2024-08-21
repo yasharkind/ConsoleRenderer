@@ -14,6 +14,8 @@ void swap(T a, T b) {
 point2D castPoint(point3D *point) {
     // x = (X * FOV) / (Z + FOV)
     // y = (Y * FOV) / (Y + FOV)
+
+    // weak projection formula easy but a bit inaccurate
     float x = (point->x * FOV) / (point->z + FOV);
     float y = (point->y * FOV) / (point->z + FOV);
 
@@ -30,6 +32,7 @@ Renderer::Renderer(int width, int height) {
     this->height = height;
 
     for (int i = 0; i < height; i++) {
+        // make space in memory for the buffer
         buffer.push_back(std::vector<bool>());
         for (int j = 0; j < width; j++) {
             buffer.at(i).push_back(0);
@@ -38,29 +41,27 @@ Renderer::Renderer(int width, int height) {
 }
 
 void Renderer::Point2D(point2D *point) {
+    // draw a 2D point by making buffer[y][x] = true
     float x = point->x;
     float y = point->y;
     
-    int w = this->width;
-    int h = this->height;
-
-    float new_x = this->ToPixels(x, w);
-    float new_y = this->ToPixels(y, h);
     try {
-        this->buffer.at(this->ToPixels(y, h)).at(this->ToPixels(x, w)) = 1;
+        this->buffer.at(this->ToPixels(y, height)).at(this->ToPixels(x, width)) = 1;
     } catch (std::out_of_range e) {}
 }
 
 void Renderer::Line2D(point2D *point1, point2D *point2) {
+    // some weird algorithm i came up with for drawing a 2d line over a pixelated screen
+    // lets say the line is vertical, then it has to break y2 - y1 times if y2 > y1
+    // and to calcualte where it needs to break we do n = (x2 - x1) / (y2 - y1)
+    // so the y value of the line should go up by 1 every nth pixel
+    // has some bugs for very high slope values but im too lazy to fix
 
-    int w = this->width;
-    int h = this->height;
+    int x1 = ToPixels(point1->x, width);
+    int y1 = ToPixels(point1->y, height);
 
-    int x1 = this->ToPixels(point1->x, w);
-    int y1 = this->ToPixels(point1->y, h);
-
-    int x2 = this->ToPixels(point2->x, w);
-    int y2 = this->ToPixels(point2->y, h);
+    int x2 = ToPixels(point2->x, width);
+    int y2 = ToPixels(point2->y, height);
 
     if (x1 > x2){
 
